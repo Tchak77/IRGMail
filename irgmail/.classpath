@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="vert.x-3.0.0/lib/netty-common-4.0.28.Final.jar"/>
 	<classpathentry kind="lib" path="vert.x-3.0.0/lib/jackson-databind-2.5.3.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="mail/javax.mail.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
