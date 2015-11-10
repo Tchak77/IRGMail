@@ -1,0 +1,38 @@
+<html>
+ <head>
+  <script src="asset/jquery-2.1.4.js"></script>
+  <script>
+   $(document).ready(function() {
+     var table = $("#mails");
+     $.get('/mails/', function(array) {
+       $.each(array, function(index, mail) {
+          table.append('<tr id="row' + index + '"><td>' + index + '</td><td>' + mail.subject + '</td><td>' + mail.from + '</td></tr>');
+       });
+       
+       var detail = $("#detail");
+       for(index in array) {
+          (function(idx) {  // I hate JS !
+            $("#row" + idx).click(function() {
+              $.get('/mails/' + idx, function(mail) {
+                detail.html('<h3>' + mail.subject + '</h3>\n<h4>From: ' + mail.from + '</h4>\n' + mail.body);
+              });
+            });
+          })(index);
+       }
+     });
+    });
+  </script>
+ </head>
+ <body>
+  <table id="mails">
+   <tr><th></th><th>Subject</th><th>From</th></tr>
+  </table>
+
+  <br/>
+  <br/>
+
+  <div id="detail">
+  </div>
+
+ </body>
+</html>
