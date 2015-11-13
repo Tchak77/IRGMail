@@ -9,10 +9,10 @@ import io.vertx.core.Vertx;
 public class Main {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
-//		Vertx vertx = Vertx.vertx();
-//		vertx.deployVerticle(new Server());
-		Server server = new Server();
-		server.collectMails();
+		Vertx vertx = Vertx.vertx();
+		vertx.deployVerticle(new Server());
+//		Server server = new Server();
+//		server.collectMails();
 	}
 
 }

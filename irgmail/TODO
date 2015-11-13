@@ -1,0 +1,43 @@
+TODO :
+-----------
+1. Configuration 
+La configuration, serveur de mail, protocol, login, password, plugins, etc. se fait par un fichier properties unique qui réside sur le serveur (et bien sûr pas accessible à partir d'un browser).
+
+-> Mettre le config.properties dans un repertoire parent de l'index.html ?
+-----------
+2. Sécurité 
+IRGMail ne propose pas par défaut de sécurité à part vérifier que le(s) browser(s) Web qui se connecte(nt) possède(nt) la même adresse IP que le serveur Web, c-a-d vérifier que le serveur et le browser web tournent sur la même machine.
+
+-> Récuperer IP client/serveur ?
+-----------
+3. Récupération des mails 
+IRGMail ne stocke pas lui-même les mails mais doit être capable de récupérer les mails auprès d'un fournisseur de mails en utilisant les protocoles IMAP et POP et leurs versions sécurisées (IMAPS, POPS). 
+La récupération des mails doit être asynchrone et se faire en tâche de fond dans une ou plusieurs threads dediées.
+
+-> On sait déjà récuperer. Mettre dans une Thread de fond et stocker uniquement les en-têtes pour acquisition sur click.
+-----------
+4. Stockage des mails 
+IRGMail n'utilise pas de base de donnée relationelle/NoSQL pour stocker les messages, ceux-ci restent stockés sur le serveur ayant recu le mail. Bien sûr, pour des questions de performance, une partie des mails peuvent être stockées en mémoire tant que cela reste raisonnable (1 Giga n'est pas raisonnable). 
+Le programme doit donc avoir un algorithme spécifique permettant de garder en mémoire uniquement la partie intéressante des mails, qui sont eux mêmes composés d'un entête, d'un corps de message et d'attachement(s).
+
+-> Stockage des en-tête uniquement ?
+-----------
+5. Affichage des mails 
+IRGMail doit être capable d'afficher les mails ainsi que leur contenu et afficher automatiquement les nouveaux mails arrivant sans que l'utilisateur n'ait à effectuer d'action. 
+De plus, l'affichage doit distinguer les mails qui sont lus des mails qui ne sont pas lus (cet état doit être synchronisé avec le fournisseur de mails).
+
+-> JSON (Afficher les non lus en GRAS) ?
+-----------
+6. La recherche de mails 
+L'application doit permettre de rechercher/filtrer des messages par les valeurs des champs présents dans l'entête. La recherche doit fonctionner comme Google: on tape un truc dans la barre de recherche et ça marche (pas d'option pour dire s'il s'agit d'un mot du titre, du nom de la personne qui a envoyé le mail, etc). 
+Pour accélérer les choses, l'application doit maintenir un index sans utiliser de blibliothèque externe.
+
+-> Si on stocke l'en-tête c'est easy ?
+-----------
+7. Plugins 
+L'application doit être developpée au maximum en utilisant un système de plugins permettant à un utilisateur de configurer son application on ajoutant ou non des plugins (par exemple, pour activer ou non la recherche de mails). 
+Ce qu'est un plugin, ainsi que le format de description choisi, sont laissés à votre convenance. 
+De plus, on vous demande de développer un plugin spécifique ajoutant une fonctionnalité qui n'est pas listée ci-dessus (ni développée par vos camarades).
+
+-> On verra plus tard !
+-----------
