@@ -1,6 +1,7 @@
 package fr.umlv.irgmail;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -29,12 +30,13 @@ class MailBase {
 		return mailMap.size();
 	}
 
+	/*Mail non mutable donc ok*/
 	public Mail getAMail(int index) {
 		return mailMap.get(index);
 	}
 
 	public Collection<Mail> values() {
-		return mailMap.values();
+		return Collections.unmodifiableCollection(mailMap.values());
 	}
 	
 }

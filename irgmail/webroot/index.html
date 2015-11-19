@@ -1,38 +1,77 @@
+
+
+
 <html>
- <head>
-  <script src="asset/jquery-2.1.4.js"></script>
-  <script>
-   $(document).ready(function() {
-     var table = $("#mails");
-     $.get('/mails/', function(array) {
-       $.each(array, function(index, mail) {
-          table.append('<tr id="row' + index + '"><td>' + index + '</td><td>' + mail.subject + '</td><td>' + mail.from + '</td></tr>');
-       });
-       
-       var detail = $("#detail");
-       for(index in array) {
-          (function(idx) {  // I hate JS !
-            $("#row" + idx).click(function() {
-              $.get('/mails/' + idx, function(mail) {
-                detail.html('<h3>' + mail.subject + '</h3>\n<h4>From: ' + mail.from + '</h4>\n' + mail.body);
-              });
-            });
-          })(index);
-       }
-     });
-    });
-  </script>
- </head>
- <body>
-  <table id="mails">
-   <tr><th></th><th>Subject</th><th>From</th></tr>
-  </table>
+<head>
+    <link rel='stylesheet' type='text/css' href='style.css'>
+    <script src="asset/jquery-2.1.4.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+         var table = $("#mails");
+         $.get('/mails/', function(array) {
+           $.each(array, function(index, mail) {
+              table.append('<tr id="row' + index + '"><td>' + mail.subject + '</td></br><td>' + mail.from + '</td></tr>');
+           });
 
-  <br/>
-  <br/>
+           var detail = $("#detail");
+           for(index in array) {
+              (function(idx) {  // I hate JS !
+                $("#row" + idx).click(function() {
+                  $.get('/mails/' + idx, function(mail) {
+                    detail.html('<h5>Subject: ' + mail.subject + '</h5><h5>From: ' + mail.from + '</h5>\n\n<h6>' + mail.body + '</h6>');
+                  });
+                });
+              })(index);
+           }
+         });
+        });
+    </script>
+</head>
+<body>
+    <div id='navbar'>
+        <div id='navbarleft'>
+             <img src='img/irgmail.png'>
+        </div>
 
-  <div id="detail">
-  </div>
+        <div id='navbarright'>
+            <form action="">
+               Search: <input id="champ" type="text"/>
+                <input type="submit">
+            </form>
+        </div>   
+    </div> 
 
- </body>
+    <div id="wrapper">
+        <div id="boxes" >
+            <table>
+                <tr><th>Boite de reception</th></tr>
+                <tr><td><a href="envoi.php" class="lien1">Envoyer mail</a></td></tr>
+                
+                
+            </table>
+        </div>
+        <div id="divmails">
+            <table id="mails">
+                <tr><th>Subject</th><th>From</th></tr>
+            </table>
+        </div>
+
+        <div id="detail">
+            <h5>
+                De: <br>
+                Pour: <br/>
+                Sujet: <br/>
+                <br/>
+            </h5>
+            <h6>
+            </h6>
+        </div>
+    </div>
+    
+    
+</body>
+<footer></footer>
+
 </html>
+                    
