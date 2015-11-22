@@ -10,17 +10,20 @@ public class Mail {
 	private final Date date;
 	private final String subject;
 	private final String body;
+	private boolean seen;
 
-	public Mail(String from, String to, Date date, String subject, String body) {
+	public Mail(String from, String to, Date date, String subject, String body, boolean seen) {
 		this.from = Objects.requireNonNull(from);
 		this.to = Objects.requireNonNull(to);
 		this.date = Objects.requireNonNull(date);
 		this.subject = Objects.requireNonNull(subject);
 		this.body = Objects.requireNonNull(body);
+		this.seen = seen;
 	}
 
 	public String headerToString() {
 		return "{" 
+				+ "\"seen\": \"" + seen + "\","
 				+ "\"subject\": \"" + subject + "\", " 
 				+ "\"from\": \"" + from + "\""
 //				+ "\"date\": \"" + date.toString() + "\""

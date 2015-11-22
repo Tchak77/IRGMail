@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Properties;
 
 import javax.mail.Address;
+import javax.mail.Flags;
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -44,7 +45,8 @@ public class MailCollector {
 		String subject = message.getSubject();
 		Date date = message.getReceivedDate();
 		String body = bodyParser(message);
-		return new Mail(from, to, date, subject, body);
+		boolean seen = message.getFlags().contains(Flags.Flag.SEEN);
+		return new Mail(from, to, date, subject, body, seen);
 	}
 
 	private static String bodyParser(Part p) throws IOException,

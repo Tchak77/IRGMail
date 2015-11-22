@@ -11,8 +11,16 @@
          var table = $("#mails");
          $.get('/mails/', function(array) {
            $.each(array, function(index, mail) {
-              table.append('<tr id="row' + index + '"><td>' + mail.subject + '</td></br><td>' + mail.from + '</td></tr>');
-           });
+               console.log(mail.seen);
+               
+               if(mail.seen == "true" ){
+                   console.log("1");
+                    table.append('<tr id="row' + index + '"><td>' + mail.subject + '</td></br><td>' + mail.from + '</td></tr>');
+               }else{
+                   console.log("2");
+                   table.append('<tr id="row' + index + '"><td><b>' + mail.subject + '</b></td></br><td>' + mail.from + '</td></tr>');
+               }
+            });
 
            var detail = $("#detail");
            for(index in array) {
