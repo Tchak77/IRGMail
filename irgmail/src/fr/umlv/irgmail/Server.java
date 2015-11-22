@@ -2,7 +2,6 @@ package fr.umlv.irgmail;
 
 import static java.util.stream.Collectors.joining;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Future;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -17,7 +16,8 @@ public class Server extends AbstractVerticle {
 	private final MailBase base = MailBase.getInstance();
 
 	private void getAMail(RoutingContext routingContext) {
-		if(routingContext.request().localAddress().host() == "127.0.0.1"){
+		System.out.println("tg");
+		if(routingContext.request().localAddress().host().equals(routingContext.request().remoteAddress().host())){
 		HttpServerResponse response = routingContext.response();
 		String id = routingContext.request().getParam("id");
 		int index;
@@ -31,8 +31,8 @@ public class Server extends AbstractVerticle {
 		}
 	}
 
-	private void getAllMails(RoutingContext routingContext) {
-		if(routingContext.request().localAddress().host() == "127.0.0.1"){
+	private void getAllMails(RoutingContext routingContext) {	
+		if(routingContext.request().localAddress().host().equals(routingContext.request().remoteAddress().host())){
 		routingContext
 				.response()
 				.putHeader("content-type", "application/json")
@@ -42,8 +42,7 @@ public class Server extends AbstractVerticle {
 	}
 
 	@Override
-	public void start(Future<Void> startFuture) throws MessagingException,
-			IOException {
+	public void start() throws MessagingException, IOException {
 		Router router = Router.router(vertx);
 		// route to JSON REST APIs
 		router.get("/mails").handler(this::getAllMails);
@@ -52,13 +51,7 @@ public class Server extends AbstractVerticle {
 		router.route().handler(StaticHandler.create());
 		vertx.createHttpServer()
 			 .requestHandler(router::accept)
-			 .listen(8080, res -> {
-					if (res.succeeded()) {
-						startFuture.complete();
-					} else {
-						startFuture.fail(res.cause());
-					}
-				});
+			 .listen(8080);
 	}
 
 }

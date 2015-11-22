@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Properties;
 
 import javax.mail.Address;
@@ -18,13 +19,18 @@ import javax.mail.Session;
 import javax.mail.Store;
 
 public class MailCollector {
-	
+
 	private Folder inbox;
 	private final MailBase base = MailBase.getInstance();
-	
-	private void collectMails() throws MessagingException, IOException {
+
+	private void collectMails(int pageNumber) throws MessagingException,
+			IOException {
+		if (pageNumber < 0) {
+			throw new IllegalArgumentException("page number < 0");
+		}
 		Message[] messages = inbox.getMessages();
-		for (int i = 0; i < messages.length; i++) {
+		int start = pageNumber * 30;
+		for (int i = start; i < messages.length && i < start+30; i++) {
 			base.addAMail(messageToMail(messages[i]));
 		}
 	}
@@ -36,8 +42,9 @@ public class MailCollector {
 		String from = Arrays.toString(senders);
 		String to = Arrays.toString(recipients);
 		String subject = message.getSubject();
+		Date date = message.getReceivedDate();
 		String body = bodyParser(message);
-		return new Mail(from, to, subject, body);
+		return new Mail(from, to, date, subject, body);
 	}
 
 	private static String bodyParser(Part p) throws IOException,
@@ -75,8 +82,8 @@ public class MailCollector {
 		}
 		return "";
 	}
-	
-	public void start() throws IOException, MessagingException{
+
+	public void start() throws IOException, MessagingException {
 		Properties properties = new Properties();
 		try (InputStream input = new FileInputStream("config.properties")) {
 			properties.load(input);
@@ -87,6 +94,6 @@ public class MailCollector {
 					  properties.getProperty("password"));
 		inbox = store.getFolder("INBOX");
 		inbox.open(READ_ONLY);
-		collectMails();
+		collectMails(0); /* Default */
 	}
 }
