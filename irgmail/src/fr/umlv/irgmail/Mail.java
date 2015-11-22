@@ -32,8 +32,8 @@ public class Mail {
 				+ "\"subject\": \"" + subject + "\", " 
 //				+ "\"to\": \"" + to + "\", " 
 //				+ "\"date\": \"" + date.toString() + "\", "
-				+ "\"from\": \"" + from.replace(">","§").replace("<", "<i>").replace("§", "</i>") + "\", " 
-				+ "\"body\": \"" + body + "\"" 
+				+ "\"from\": \"" + from.replace(">","ï¿½").replace("<", "<i>").replace("ï¿½", "</i>") + "\", " 
+				+ "\"body\": \"" + body.replace('"', '\'') + "\"" 
 				+ "}";
 	}
 
