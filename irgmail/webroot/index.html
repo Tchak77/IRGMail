@@ -19,7 +19,7 @@
               (function(idx) {  // I hate JS !
                 $("#row" + idx).click(function() {
                   $.get('/mails/' + idx, function(mail) {
-                    detail.html('<h5>Subject: ' + mail.subject + '</h5><h5>From: ' + mail.from + '</h5>\n\n<h6>' + mail.body + '</h6>');
+                    detail.html('<h5>Subject: ' + mail.subject + '</h5><h5>From: ' + mail.from +'</h5><h5>Date: ' +mail.date+'</h5><h5>To: ' +mail.to+ '</h5><h6>' + mail.body + '</h6>');
                   });
                 });
               })(index);
@@ -58,14 +58,7 @@
         </div>
 
         <div id="detail">
-            <h5>
-                De: <br>
-                Pour: <br/>
-                Sujet: <br/>
-                <br/>
-            </h5>
-            <h6>
-            </h6>
+
         </div>
     </div>
     

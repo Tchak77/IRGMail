@@ -28,13 +28,16 @@ public class Mail {
 	}
 
 	public String mailToString() {
-		return "{" 
+		String content = "{" 
 				+ "\"subject\": \"" + subject + "\", " 
-//				+ "\"to\": \"" + to + "\", " 
-//				+ "\"date\": \"" + date.toString() + "\", "
-				+ "\"from\": \"" + from.replace(">","�").replace("<", "<i>").replace("�", "</i>") + "\", " 
-				+ "\"body\": \"" + body.replace('"', '\'') + "\"" 
-				+ "}";
+				+ "\"to\": \"" + to + "\", " 
+				+ "\"date\": \"" + date.toString() + "\", "
+				+ "\"from\": \"" + from.replace(">","�").replace("<", "<i>").replace("�", "</i>") + "\", " ;
+				content += "\"body\": \"" + body.replace('"', '\''); 
+				if(content.charAt(content.length()-1 ) == '\n'){
+					return content.substring(0,content.length()-2)+"\"}";
+				}
+				return content+"\"}";
 	}
 
 }
