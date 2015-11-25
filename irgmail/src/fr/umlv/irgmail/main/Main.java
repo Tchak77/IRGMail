@@ -10,6 +10,6 @@ public class Main {
 
 	public static void main(String[] args) throws IOException, MessagingException {
 		MainServer server = new MainServer();
-		server.start();	
+		server.start();
 	}
 }

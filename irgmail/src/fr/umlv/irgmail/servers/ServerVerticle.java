@@ -5,27 +5,18 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 
 import java.io.IOException;
-import java.util.Objects;
 
 import javax.mail.MessagingException;
 
 public class ServerVerticle extends AbstractVerticle {
-		
-	private MailCollector collector;
-	
-	public void setCollector(MailCollector collector){
-		this.collector = Objects.requireNonNull(collector);
-	}
-	
+			
 	@Override
 	public void start() throws MessagingException, IOException {
 		Router router = Router.router(vertx);
-		if(collector == null){
-			throw new IllegalStateException("collector is null");
-		}
+		ContextHandler contextHandler = ContextHandler.getSingleton();
 		// route to JSON REST APIs
-		router.get("/mails/page/:page").handler(collector::getAllMails);
-		router.get("/mails/:id").handler(collector::getAMail);
+		router.get("/mails/page/:page").handler(contextHandler::getAllMails);
+		router.get("/mails/:id").handler(contextHandler::getAMail);
 		// otherwise serve static pages
 		router.route().handler(StaticHandler.create());
 		vertx.createHttpServer().requestHandler(router::accept).listen(8080);

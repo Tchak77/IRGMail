@@ -11,17 +11,25 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 
-public class Authenticator {
+public class PropertiesHandler {
 
-	static Folder authenticate() throws FileNotFoundException, IOException, MessagingException{
-		Properties properties = new Properties();
+	private final Properties properties;
+	
+	public PropertiesHandler() {
+		properties = new Properties();
+	}
+	
+	public void loadProperties() throws FileNotFoundException, IOException{
 		try (InputStream input = new FileInputStream("config.properties")) {
 			properties.load(input);
 		}
+	}
+	
+	public Folder getInbox() throws MessagingException{
 		String user = properties.getProperty("user");
 		String passwd = properties.getProperty("password");
 		Store store = Session.getInstance(properties).getStore();
-		store.connect(user, passwd);
+		store.connect(user, passwd);		
 		return store.getFolder("INBOX");
 	}
 	

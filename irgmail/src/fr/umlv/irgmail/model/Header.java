@@ -1,4 +1,4 @@
-package fr.umlv.irgmail.models;
+package fr.umlv.irgmail.model;
 
 class Header {
 	
