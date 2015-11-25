@@ -1,6 +1,7 @@
 var page = 0;
 
 loadMails();
+setInterval(loadMails, 10000);
 
 function pageDown(){
 	if(page > 0){

@@ -24,7 +24,7 @@ public class ContextHandler {
 	private final ExecutorService executor;
 	private final HashMap<String, Consumer<RoutingContext>> handlers;
 
-	public ContextHandler() {
+	ContextHandler() {
 		this.manager = new MailManager();
 		executor = Executors.newFixedThreadPool(10);
 		handlers = new HashMap<String, Consumer<RoutingContext>>();

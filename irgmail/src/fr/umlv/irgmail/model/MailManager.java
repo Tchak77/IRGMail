@@ -19,11 +19,28 @@ public class MailManager {
 	
 	private Folder inbox;
 	private int mailsCounter;
+	private final Thread updater;
 	private ConcurrentHashMap<Integer, Header> headers;
 	private ConcurrentHashMap<Integer, Content> contents;
 	
 	public MailManager() {
 		mailsCounter = 0;
+		updater = new Thread( () -> {
+			while(!Thread.currentThread().isInterrupted()){
+				try {
+					Thread.sleep(10000);
+					System.out.println("Thread : Start");
+					if(inbox.getMessageCount()!=mailsCounter){
+						System.out.println("Thread : Update");
+						headers.clear();
+						contents.clear();
+					}
+					System.out.println("Thread : End");
+				} catch (InterruptedException | MessagingException e) {
+					Thread.currentThread().interrupt();
+				}
+			}
+		});
 		headers = new ConcurrentHashMap<Integer, Header>();
 		contents = new ConcurrentHashMap<Integer, Content>();
 	}
@@ -56,7 +73,7 @@ public class MailManager {
 		if(headers.get(start+1)==null){
 			collectHeadersByPage(page);
 		}
-		for(int i=end-1;i>=start;i--){
+		for(int i=end;i>start;i--){
 			tmp.add(headers.get(i));
 		}
 		return tmp.stream().map(Header::toJSONString);
@@ -73,5 +90,6 @@ public class MailManager {
 	public void startOnFolder(Folder folder) throws MessagingException {
 		inbox = Objects.requireNonNull(folder);
 		inbox.open(READ_WRITE);
+		updater.start();
 	}
 }
