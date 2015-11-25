@@ -18,7 +18,7 @@ public class Authenticator {
 		try (InputStream input = new FileInputStream("config.properties")) {
 			properties.load(input);
 		}
-		String user = properties.getProperty("mail.imap.user");
+		String user = properties.getProperty("user");
 		String passwd = properties.getProperty("password");
 		Store store = Session.getInstance(properties).getStore();
 		store.connect(user, passwd);

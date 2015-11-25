@@ -27,46 +27,23 @@ public class MailManager {
 	private static final int PAGE_OFFSET = 10;
 	
 	private Folder inbox;
+	private int mailsCounter;
 	private final ConcurrentHashMap<Integer, Header> headers = new ConcurrentHashMap<Integer, Header>();
-	private final HashMap<Integer, Content> contents = new HashMap<Integer, Content>();
-	private final ExecutorService executor = Executors.newFixedThreadPool(10);
+	private final ConcurrentHashMap<Integer, Content> contents = new ConcurrentHashMap<Integer, Content>();
 
-	private void collectHeaders(int page) throws MessagingException {
-		System.out.println("collectHEader");
+	private void collectHeadersByPage(int page) throws MessagingException {
 		int nb = inbox.getMessageCount();
 		int start = Math.max(1, nb-(page+1)*PAGE_OFFSET);
 		int end = nb-page*PAGE_OFFSET;
 		Message[] messages = inbox.getMessages(start, end);
-//		collectInParallel(messages);
 		for (int i = 0; i < messages.length; i++) {
 			int id = messages[i].getMessageNumber();
 			headers.put(id, MessageParser.messageToHead(messages[i]));
 		}
-		System.out.println("fin");
 	}
 	
-	private void collectInParallel(Message[] messages){
-		for(int i = 0;i<messages.length;i+=2){
-			int start = i;
-			int end = Math.min(i+2,	messages.length);
-			executor.execute( () -> {
-				for(int j = start;j<end;j++){
-					try {
-						int id = messages[j].getMessageNumber();
-						headers.put(id, MessageParser.messageToHead(messages[j]));
-					} catch (MessagingException e) {
-						throw new RuntimeException(e);
-					}
-				}
-			});
-		}
-		System.out.println("begin");
-		try {
-			executor.awaitTermination(40, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			throw new AssertionError(e);
-		}
-		System.out.println("ended");
+	private void collectHeadersByWord(String keyword){
+		
 	}
 
 	private void collectContent(int index) throws MessagingException, IOException {
@@ -79,7 +56,6 @@ public class MailManager {
 	}
 
 	public Stream<String> headers(int page) {
-		System.out.println("headers");
 		ArrayList<Header> tmp = new ArrayList<Header>();
 		int nb, start, end = 0;
 		try {
@@ -87,7 +63,7 @@ public class MailManager {
 			start = Math.max(1, nb-(page+1)*PAGE_OFFSET);
 			end = nb-page*PAGE_OFFSET;
 			if(headers.get(start+1)==null){
-				collectHeaders(page);
+				collectHeadersByPage(page);
 			}
 		} catch (MessagingException e) {
 			throw new RuntimeException(e);
@@ -95,7 +71,6 @@ public class MailManager {
 		for(int i=end-1;i>=start;i--){
 			tmp.add(headers.get(i));
 		}
-		System.out.println("fin");
 		return tmp.stream().map(Header::toJSONString);
 	}
 
@@ -115,7 +90,6 @@ public class MailManager {
 	
 	public void start(Folder folder) throws MessagingException {
 		inbox = Objects.requireNonNull(folder);
-		//inbox = store.getFolder("INBOX");
 		inbox.open(READ_WRITE);
 	}
 }
