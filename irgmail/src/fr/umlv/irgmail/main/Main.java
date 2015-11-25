@@ -12,5 +12,4 @@ public class Main {
 		MainServer server = new MainServer();
 		server.start();	
 	}
-
 }
