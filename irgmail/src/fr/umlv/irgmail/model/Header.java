@@ -1,5 +1,7 @@
 package fr.umlv.irgmail.model;
 
+import java.util.Objects;
+
 class Header {
 	
 	private final int ID;
@@ -7,13 +9,14 @@ class Header {
 	private final String subject;
 	private final String date;
 	private boolean seen;
+	private final Object monitor = new Object();
 	
 	Header(int ID, String from, String subject, boolean seen, String date) {
-		this.ID = ID;
-		this.from = from;
-		this.subject = subject;
-		this.date = date;
-		this.seen = seen;
+		this.ID = Objects.requireNonNull(ID);
+		this.from = Objects.requireNonNull(from);
+		this.subject = Objects.requireNonNull(subject);
+		this.date = Objects.requireNonNull(date);
+		this.seen = Objects.requireNonNull(seen);
 	}
 	
 	String toJSONString(){
@@ -36,7 +39,9 @@ class Header {
 	}
 	
 	void setSeen(){
-		this.seen = true;
+		synchronized (monitor) {
+			this.seen = true;
+		}
 	}
 
 	boolean getSeen() {

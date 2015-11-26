@@ -29,8 +29,12 @@ public class PropertiesHandler {
 		String user = properties.getProperty("user");
 		String passwd = properties.getProperty("password");
 		Store store = Session.getInstance(properties).getStore();
-		store.connect(user, passwd);		
-		return store.getFolder("INBOX");
+		store.connect(user, passwd);
+		try{
+			return store.getFolder("INBOX");
+		}finally{
+			store.close();
+		}
 	}
 	
 }

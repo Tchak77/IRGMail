@@ -46,7 +46,13 @@ public class MailManager {
 	 */
 	public MailManager() {
 		mailsCounter = 0;
-		updater = new Thread(() -> {
+		updater = new Thread(newUpdater());
+		headers = new ConcurrentHashMap<Integer, Header>();
+		contents = new ConcurrentHashMap<Integer, Content>();
+	}
+	
+	private Runnable newUpdater(){
+		return () -> {
 			while (!Thread.currentThread().isInterrupted()) {
 				try {
 					Thread.sleep(10000);
@@ -62,9 +68,7 @@ public class MailManager {
 					Thread.currentThread().interrupt();
 				}
 			}
-		});
-		headers = new ConcurrentHashMap<Integer, Header>();
-		contents = new ConcurrentHashMap<Integer, Content>();
+		};
 	}
 
 	private void collectHeadersByPage(int page) throws MessagingException {
