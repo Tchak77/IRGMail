@@ -5,32 +5,32 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 
 import fr.umlv.irgmail.model.MailManager;
+import fr.umlv.irgmail.plugins.Plugable;
 
 public class ContextHandler {
 
 	private static ContextHandler HANDLER = new ContextHandler();
-	
+
 	private MailManager manager;
 	private final ExecutorService executor;
-	private final HashMap<String, Consumer<RoutingContext>> handlers;
+	private final List<Plugable> plugins;
 
 	ContextHandler() {
 		this.manager = new MailManager();
+		plugins = new ArrayList<Plugable>();
 		executor = Executors.newFixedThreadPool(10);
-		handlers = new HashMap<String, Consumer<RoutingContext>>();
 	}
-	
-	public void startManager(Folder folder){
+
+	public void startManager(Folder folder) {
 		try {
 			manager.startOnFolder(folder);
 		} catch (MessagingException e) {
@@ -38,99 +38,78 @@ public class ContextHandler {
 		}
 	}
 
-	static ContextHandler getSingleton(){
+	static ContextHandler getSingleton() {
 		return HANDLER;
-	}
-	
-	public void addHandler(String param, Consumer<RoutingContext> consumer) {
-		Objects.requireNonNull(param);
-		Objects.requireNonNull(consumer);
-		handlers.put(param, consumer);
 	}
 
 	public void getAMail(RoutingContext routingContext) {
-		handlers.getOrDefault(
-				"/mails/:id",
-				(context) -> {
-					HttpServerResponse response = context.response();
-					if (!context.request().localAddress().host()
-							.equals(context.request().remoteAddress().host())) {
-						response.setStatusCode(403).end();
-						return;
-					}
-					String id = context.request().getParam("id");
-					int index;
-					if (id == null || (index = Integer.parseInt(id)) < 0) {
-						response.setStatusCode(404).end();
-						return;
-					}
-					executor.execute(() -> {
-							try {
-								response.putHeader("content-type", "application/json")
-										.end(manager.mailToJSON(index));
-							} catch (MessagingException | IOException e) {
-								response.setStatusCode(503).end();
-							}
-					});
-				}).accept(routingContext);
+		HttpServerResponse response = routingContext.response();
+		if (!routingContext.request().localAddress().host()
+				.equals(routingContext.request().remoteAddress().host())) {
+			response.setStatusCode(403).end();
+			return;
+		}
+		String id = routingContext.request().getParam("id");
+		int index;
+		if (id == null || (index = Integer.parseInt(id)) < 0) {
+			response.setStatusCode(404).end();
+			return;
+		}
+		executor.execute(() -> {
+			try {
+				response.putHeader("content-type", "application/json").end(
+						manager.mailToJSON(index));
+			} catch (MessagingException | IOException e) {
+				response.setStatusCode(503).end();
+			}
+		});
 	}
 
 	public void getAllMails(RoutingContext routingContext) {
-		handlers.getOrDefault(
-				"/mails/page/:page",
-				(context) -> {
-					HttpServerResponse response = context.response();
-					if (!context.request().localAddress().host()
-							.equals(context.request().remoteAddress().host())) {
-						response.setStatusCode(403).end();
-						return;
-					}
-					String page = context.request().getParam("page");
-					int page_index;
-					if (page == null
-							|| (page_index = Integer.parseInt(page)) < 0) {
-						response.setStatusCode(404).end();
-						return;
-					}
-					executor.execute(() -> {
-						try {
-							response.putHeader("content-type",
-									"application/json").end(
-									manager.headersByPage(page_index).collect(
-											joining(", ", "[", "]")));
-						} catch (Exception e) {
-							response.setStatusCode(503).end();
-						}
-					});
-				}).accept(routingContext);
+		HttpServerResponse response = routingContext.response();
+		if (!routingContext.request().localAddress().host()
+				.equals(routingContext.request().remoteAddress().host())) {
+			response.setStatusCode(403).end();
+			return;
+		}
+		String page = routingContext.request().getParam("page");
+		int page_index;
+		if (page == null || (page_index = Integer.parseInt(page)) < 0) {
+			response.setStatusCode(404).end();
+			return;
+		}
+		executor.execute(() -> {
+			try {
+				response.putHeader("content-type", "application/json").end(
+						manager.headersByPage(page_index).collect(
+								joining(", ", "[", "]")));
+			} catch (Exception e) {
+				response.setStatusCode(503).end();
+			}
+		});
 	}
-	
-	public void searchMails(RoutingContext routingContext){
-		handlers.getOrDefault(
-				"/mails/search/:search",
-				(context) -> {
-					HttpServerResponse response = context.response();
-					if (!context.request().localAddress().host()
-							.equals(context.request().remoteAddress().host())) {
-						response.setStatusCode(403).end();
-						return;
-					}
-					String search = context.request().getParam("search");
-					if (search == null || search == "") {
-						response.setStatusCode(404).end();
-						return;
-					}
-					executor.execute(() -> {
-						try {
-							response.putHeader("content-type",
-									"application/json").end(
-									manager.headersByKeywords(search).collect(
-											joining(", ", "[", "]")));
-						} catch (Exception e) {
-							response.setStatusCode(503).end();
-						}
-					});
-				}).accept(routingContext);
+
+	public void searchMails(RoutingContext routingContext) {
+		HttpServerResponse response = routingContext.response();
+		if (!routingContext.request().localAddress().host()
+				.equals(routingContext.request().remoteAddress().host())) {
+			response.setStatusCode(403).end();
+			return;
+		}
+		String search = routingContext.request().getParam("search");
+		if (search == null || search == "") {
+			response.setStatusCode(404).end();
+			return;
+		}
+		executor.execute(() -> {
+			try {
+				response.putHeader("content-type", "application/json").end(
+						manager.headersByKeywords(search).collect(
+								joining(", ", "[", "]")));
+			} catch (Exception e) {
+				response.setStatusCode(503).end();
+			}
+		});
 	}
 
 }
