@@ -1,6 +1,8 @@
 var page = 0;
 var lastGet = "/mails/page/0";
 
+var start = new Date().getTime();
+while(new Date().getTime() - start < 3000){}
 loadMails();
 setInterval("update()", 10000);
 

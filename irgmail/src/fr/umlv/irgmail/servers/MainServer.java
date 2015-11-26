@@ -9,7 +9,7 @@ import javax.mail.MessagingException;
 
 public class MainServer {
 		
-	public void start() throws IOException, MessagingException{
+	public void start() throws IOException, MessagingException {
 		/*Get properties*/
 		PropertiesHandler propertiesHandler = new PropertiesHandler();
 		propertiesHandler.loadProperties();

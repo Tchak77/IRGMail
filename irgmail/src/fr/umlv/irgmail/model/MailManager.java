@@ -58,7 +58,6 @@ public class MailManager {
 					Thread.sleep(10000);
 					if (inbox.getMessageCount() != mailsCounter) {
 						mailsCounter = inbox.getMessageCount();
-						System.out.println("Thread : Update");
 						headers.clear();
 						contents.clear();
 					}
