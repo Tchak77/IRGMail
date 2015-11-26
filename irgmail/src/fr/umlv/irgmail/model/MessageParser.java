@@ -50,9 +50,8 @@ class MessageParser {
 	}
 
 	private static String traitementMultipart(Multipart mp, ArrayList<String> files, ArrayList<String> medias) throws IOException, MessagingException {
-		String text = null;
-		text = traitementPart(files, medias, mp, text);
-		return text;
+		return traitementPart(files, medias, mp, null);
+
 	}
 
 	private static String traitementPart(ArrayList<String> files, ArrayList<String> medias, Multipart mp, String text)
@@ -104,6 +103,7 @@ class MessageParser {
 		files.add(path + "/received_" + fileName);
 		FileOutputStream fos = new FileOutputStream(file);
 		dh.writeTo(fos);
+		fos.close();
 	}
 
 	static Header messageToHead(Message message) throws MessagingException {
@@ -111,7 +111,7 @@ class MessageParser {
 		String subject = message.getSubject();
 		String date = "";
 		boolean seen = true;
-		if(PropertiesHandler.getSingleton().getProtocol()=="IMAP"){
+		if(PropertiesHandler.getSingleton().getProtocol().equals("IMAP")){
 			date = message.getReceivedDate().toString();
 			seen = message.getFlags().contains(SEEN);
 		}
