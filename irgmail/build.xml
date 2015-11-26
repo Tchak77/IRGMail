@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="jar" name="irgmail">
+
+    <path id="irgmail.classpath">
+        <pathelement location="classes"/>
+        <pathelement location="libs/vert.x-3.0.0/vertx-core-3.0.0.jar"/>
+        <pathelement location="libs/vert.x-3.0.0/vertx-web-3.0.0.jar"/>
+        <pathelement location="libs/vert.x-3.0.0/netty-handler-4.0.28.Final.jar"/>
+        <pathelement location="libs/vert.x-3.0.0/netty-transport-4.0.28.Final.jar"/>
+        <pathelement location="libs/vert.x-3.0.0/jackson-annotations-2.5.0.jar"/>
+        <pathelement location="libs/vert.x-3.0.0/jackson-core-2.5.3.jar"/>
+        <pathelement location="libs/vert.x-3.0.0/netty-buffer-4.0.28.Final.jar"/>
+        <pathelement location="libs/vert.x-3.0.0/netty-codec-4.0.28.Final.jar"/>
+        <pathelement location="libs/vert.x-3.0.0/netty-codec-http-4.0.28.Final.jar"/>
+        <pathelement location="libs/vert.x-3.0.0/netty-common-4.0.28.Final.jar"/>
+        <pathelement location="libs/vert.x-3.0.0/jackson-databind-2.5.3.jar"/>
+        <pathelement location="libs/mail/javax.mail.jar"/>
+    </path>
+    
+    <target name="clean">
+        <delete dir="classes"/>
+    </target>
+
+
+    <target name="init">
+        <mkdir dir="classes"/>
+        <copy includeemptydirs="false" todir="classes">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+
+
+    <target name="compile" depends="init">
+        <javac debug="true" destdir="classes" includeantruntime="false" srcdir="src">
+            <src path="src"/>
+            <classpath refid="irgmail.classpath"/>
+        </javac>
+    </target>
+    
+    
+    <target name="jar" depends="compile">
+        <jar destfile="irgmail.jar" basedir="classes">
+            <manifest>
+                <attribute name="Main-Class" value="fr.umlv.irgmail.main.Main"/>
+            </manifest>
+            <zipgroupfileset dir="libs/" includes="**/*.jar"/>
+        </jar>
+    </target>
+</project>
