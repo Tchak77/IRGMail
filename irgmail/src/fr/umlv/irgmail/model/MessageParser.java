@@ -36,6 +36,11 @@ class MessageParser {
 		if (p.isMimeType("text/*")) { // Contenu texte
 			return (String) p.getContent();
 		}
+		return parseMultipart(p, files, medias); 
+	}
+
+	private static String parseMultipart(Part p, ArrayList<String> files, ArrayList<String> medias)
+			throws IOException, MessagingException, FileNotFoundException {
 		Multipart mp = (Multipart)p.getContent(); //Safe cast, on sait que le contenu est un multipart
 		if (p.isMimeType("multipart/alternative")) { // Contenu ensembliste
 			return traitementMultipart(mp, files, medias);
@@ -60,14 +65,11 @@ class MessageParser {
 			if (bp.isMimeType("text/plain")) { // texte
 				if (text == null)
 					text = bodyParse(bp, files, medias);
-				continue;
 			} else if (bp.isMimeType("text/html")) { // html
-				String s = bodyParse(bp, files, medias);
-				if (s != null)
-					return s;
+				return bodyParse(bp, files, medias);
 			}
 		}
-		return text;
+		return "";
 	}
 
 	private static String traitementImage(Multipart mp, ArrayList<String> files, ArrayList<String> medias) throws IOException, MessagingException, FileNotFoundException {
