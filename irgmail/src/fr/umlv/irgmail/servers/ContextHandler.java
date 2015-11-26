@@ -26,15 +26,16 @@ public class ContextHandler {
 		executor = Executors.newFixedThreadPool(10);
 	}
 
-	public void startManager(Folder folder) {
-		try {
+	/**
+	 * Start the manager on the given Folder to retrieve mails.
+	 * @param folder the folder to get information from.
+	 * @throws MessagingException if the opening failed
+	 */
+	public void startManager(Folder folder) throws MessagingException {
 			manager.startOnFolder(folder);
-		} catch (MessagingException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
-	static ContextHandler getSingleton() {
+	static ContextHandler getInstance() {
 		return HANDLER;
 	}
 
@@ -48,7 +49,7 @@ public class ContextHandler {
 		}
 	}
 
-	public void getAMail(RoutingContext routingContext) {
+	void getAMail(RoutingContext routingContext) {
 		executor.execute(() -> { handleIfFit( routingContext, (r) -> {
 						HttpServerResponse response = r.response();
 						String id = r.request().getParam("id");
@@ -67,7 +68,7 @@ public class ContextHandler {
 		});
 	}
 
-	public void getAllMails(RoutingContext routingContext) {
+	void getAllMails(RoutingContext routingContext) {
 		executor.execute(() -> { handleIfFit(routingContext, (r) -> {
 						HttpServerResponse response = r.response();
 						String page = r.request().getParam("page");
@@ -87,7 +88,7 @@ public class ContextHandler {
 		});
 	}
 
-	public void searchMails(RoutingContext routingContext) {
+	void searchMails(RoutingContext routingContext) {
 		executor.execute(() -> { handleIfFit( routingContext, (r) -> {
 						HttpServerResponse response = r.response();
 						String search = r.request().getParam("search");
@@ -105,5 +106,4 @@ public class ContextHandler {
 					});
 		});
 	}
-
 }
