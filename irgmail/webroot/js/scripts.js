@@ -1,9 +1,20 @@
 var page = 0;
-var lastGet = "";
+var lastGet = "/mails/page/0";
 
 loadMails();
-//setInterval(loadMails, 10000);
-//search();
+setInterval("update()", 10000);
+
+function update(){
+  $(document).ready(function() {
+    var tbody = $("#mails");
+    tbody.html("");
+    $.get(lastGet, function(array) {
+      $.each(array, function(index, mail) {
+          showMail(mail);
+        });
+     });
+  });  
+}
 
 function previous(){
   $(document).ready(function() {
@@ -87,10 +98,10 @@ function search(){
   $(document).ready(function() {
     var tbody = $("#mails");
     $('.table').show();
-    $('#Prev').show();
-    $('#Next').show();
+    $('#Prev').hide();
+    $('#Next').hide();
     $('#detail').hide();
-    var keywords = $("#searchInput").value;
+    var keywords = $("#searchInput").val();
     if(keywords.length){
       tbody.html("");
       lastGet = "/mails/search/"+keywords;
