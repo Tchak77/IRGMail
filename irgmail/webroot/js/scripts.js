@@ -20,9 +20,11 @@ function previous(){
   $(document).ready(function() {
     var tbody = $("#mails");
     $('.table').show();
-    $('#Prev').show();
-    $('#Next').show();
     $('#detail').hide();
+    if(lastGet.indexOf("search") == -1){
+        $('#Prev').show();
+        $('#Next').show();
+    }
     tbody.html("");
     $.get(lastGet, function(array) {
       $.each(array, function(index, mail) {
