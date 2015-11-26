@@ -16,6 +16,8 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 
+import fr.umlv.irgmail.servers.PropertiesHandler;
+
 class MessageParser {
 
 	/**
@@ -112,8 +114,12 @@ class MessageParser {
 	static Header messageToHead(Message message) throws MessagingException {
 		String from = Arrays.toString(message.getFrom());
 		String subject = message.getSubject();
-		String date = message.getReceivedDate().toString();
-		boolean seen = message.getFlags().contains(SEEN);
+		String date = "";
+		boolean seen = true;
+		if(PropertiesHandler.getInstance().getProtocol()=="IMAP"){
+			date = message.getReceivedDate().toString();
+			seen = message.getFlags().contains(SEEN);
+		}
 		int id = message.getMessageNumber();
 		return new Header(id, from, subject, seen, date);
 	}

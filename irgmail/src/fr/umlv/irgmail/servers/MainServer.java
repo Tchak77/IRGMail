@@ -11,7 +11,7 @@ public class MainServer {
 		
 	public void start() throws IOException, MessagingException {
 		/*Get properties*/
-		PropertiesHandler propertiesHandler = new PropertiesHandler();
+		PropertiesHandler propertiesHandler = PropertiesHandler.getInstance();
 		propertiesHandler.loadProperties();
 		/*Get folder*/
 		Folder inbox = propertiesHandler.getInbox();

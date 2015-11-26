@@ -13,10 +13,16 @@ import javax.mail.Store;
 
 public class PropertiesHandler {
 
+	private static PropertiesHandler HANDLER = new PropertiesHandler();
+	
 	private final Properties properties;
 	
 	public PropertiesHandler() {
 		properties = new Properties();
+	}
+	
+	public static PropertiesHandler getInstance(){
+		return HANDLER;
 	}
 	
 	public void loadProperties() throws FileNotFoundException, IOException{
@@ -35,6 +41,10 @@ public class PropertiesHandler {
 		}finally{
 			store.close();
 		}
+	}
+
+	public String getProtocol() {
+		return properties.getProperty("mail.store.protocol");
 	}
 	
 }
