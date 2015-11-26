@@ -16,21 +16,22 @@ import javax.mail.MessagingException;
 public class MailManager {
 
 	private static final int PAGE_OFFSET = 10;
-	
+
 	private Folder inbox;
 	private int mailsCounter;
 	private final Thread updater;
 	private ConcurrentHashMap<Integer, Header> headers;
 	private ConcurrentHashMap<Integer, Content> contents;
-	
+
 	public MailManager() {
 		mailsCounter = 0;
-		updater = new Thread( () -> {
-			while(!Thread.currentThread().isInterrupted()){
+		updater = new Thread(() -> {
+			while (!Thread.currentThread().isInterrupted()) {
 				try {
 					Thread.sleep(10000);
 					System.out.println("Thread : Start");
-					if(inbox.getMessageCount()!=mailsCounter){
+					if (inbox.getMessageCount() != mailsCounter) {
+						mailsCounter = inbox.getMessageCount();
 						System.out.println("Thread : Update");
 						headers.clear();
 						contents.clear();
@@ -47,8 +48,8 @@ public class MailManager {
 
 	private void collectHeadersByPage(int page) throws MessagingException {
 		mailsCounter = inbox.getMessageCount();
-		int end = mailsCounter-page*PAGE_OFFSET;
-		int start = Math.max(1, mailsCounter-(page+1)*PAGE_OFFSET);
+		int end = mailsCounter - page * PAGE_OFFSET;
+		int start = Math.max(1, mailsCounter - (page + 1) * PAGE_OFFSET);
 		Message[] messages = inbox.getMessages(start, end);
 		for (int i = 0; i < messages.length; i++) {
 			int id = messages[i].getMessageNumber();
@@ -56,24 +57,50 @@ public class MailManager {
 		}
 	}
 
-	private void collectContent(int index) throws MessagingException, IOException {
+	private void collectHeadersByKeyword(String... keywords)
+			throws MessagingException {
+		Message[] messages = inbox.getMessages();
+		for (int i = 0; i < messages.length; i++) {
+			Header header = MessageParser.messageToHead(messages[i]);
+			if (header.contains(keywords)) {
+				int id = messages[i].getMessageNumber();
+				headers.put(id, header);
+			}
+		}
+	}
+
+	private void collectContent(int index) throws MessagingException,
+			IOException {
 		Message message = inbox.getMessage(index);
 		contents.put(index, MessageParser.messageToContent(message));
-		if(!headers.get(index).getSeen()){
+		System.out.println(headers);
+		if (!headers.get(index).getSeen()) {
 			headers.get(index).setSeen();
 			message.setFlag(SEEN, true);
 		}
 	}
 
-	public Stream<String> headers(int page) throws MessagingException {
+	public Stream<String> headersByKeywords(String... keywords)
+			throws MessagingException {
+		collectHeadersByKeyword(keywords);
+		ArrayList<Header> list = new ArrayList<Header>();
+		for (Header header : headers.values()) {
+			if (header.contains(keywords)) {
+				list.add(header);
+			}
+		}
+		return list.stream().map(Header::toJSONString);
+	}
+
+	public Stream<String> headersByPage(int page) throws MessagingException {
 		ArrayList<Header> tmp = new ArrayList<Header>();
 		int start, end = 0;
-		start = Math.max(1, mailsCounter-(page+1)*PAGE_OFFSET);
-		end = mailsCounter-page*PAGE_OFFSET;
-		if(headers.get(start+1)==null){
+		start = Math.max(0, mailsCounter - (page + 1) * PAGE_OFFSET);
+		end = mailsCounter - page * PAGE_OFFSET;
+		if (headers.get(start + 1) == null) {
 			collectHeadersByPage(page);
 		}
-		for(int i=end;i>start;i--){
+		for (int i = end; i > start; i--) {
 			tmp.add(headers.get(i));
 		}
 		return tmp.stream().map(Header::toJSONString);
@@ -86,7 +113,7 @@ public class MailManager {
 		return headers.get(index).toJSONString().replace("}", ",")
 				+ contents.get(index).toJSONString().replace("{", "");
 	}
-	
+
 	public void startOnFolder(Folder folder) throws MessagingException {
 		inbox = Objects.requireNonNull(folder);
 		inbox.open(READ_WRITE);

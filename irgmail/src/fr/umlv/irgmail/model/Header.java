@@ -26,6 +26,15 @@ class Header {
 				+"\n}";
 	}
 	
+	boolean contains(String... keywords){
+		for (String string : keywords) {
+			if(!from.contains(string) && !subject.contains(string)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	void setSeen(){
 		this.seen = true;
 	}

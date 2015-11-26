@@ -17,6 +17,7 @@ public class ServerVerticle extends AbstractVerticle {
 		// route to JSON REST APIs
 		router.get("/mails/page/:page").handler(contextHandler::getAllMails);
 		router.get("/mails/:id").handler(contextHandler::getAMail);
+		router.get("/mails/search/:search").handler(contextHandler::searchMails);
 		// otherwise serve static pages
 		router.route().handler(StaticHandler.create());
 		vertx.createHttpServer().requestHandler(router::accept).listen(8080);

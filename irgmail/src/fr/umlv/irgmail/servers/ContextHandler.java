@@ -50,7 +50,7 @@ public class ContextHandler {
 
 	public void getAMail(RoutingContext routingContext) {
 		handlers.getOrDefault(
-				"id",
+				"/mails/:id",
 				(context) -> {
 					HttpServerResponse response = context.response();
 					if (!context.request().localAddress().host()
@@ -77,7 +77,7 @@ public class ContextHandler {
 
 	public void getAllMails(RoutingContext routingContext) {
 		handlers.getOrDefault(
-				"page",
+				"/mails/page/:page",
 				(context) -> {
 					HttpServerResponse response = context.response();
 					if (!context.request().localAddress().host()
@@ -96,7 +96,35 @@ public class ContextHandler {
 						try {
 							response.putHeader("content-type",
 									"application/json").end(
-									manager.headers(page_index).collect(
+									manager.headersByPage(page_index).collect(
+											joining(", ", "[", "]")));
+						} catch (Exception e) {
+							response.setStatusCode(503).end();
+						}
+					});
+				}).accept(routingContext);
+	}
+	
+	public void searchMails(RoutingContext routingContext){
+		handlers.getOrDefault(
+				"/mails/search/:search",
+				(context) -> {
+					HttpServerResponse response = context.response();
+					if (!context.request().localAddress().host()
+							.equals(context.request().remoteAddress().host())) {
+						response.setStatusCode(403).end();
+						return;
+					}
+					String search = context.request().getParam("search");
+					if (search == null || search == "") {
+						response.setStatusCode(404).end();
+						return;
+					}
+					executor.execute(() -> {
+						try {
+							response.putHeader("content-type",
+									"application/json").end(
+									manager.headersByKeywords(search).collect(
 											joining(", ", "[", "]")));
 						} catch (Exception e) {
 							response.setStatusCode(503).end();
