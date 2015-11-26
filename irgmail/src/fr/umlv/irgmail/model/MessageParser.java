@@ -32,31 +32,28 @@ class MessageParser {
 	 * @throws IOException
 	 * @throws MessagingException
 	 */
-	static String bodyParse(Part p, ArrayList<String> files,
-			ArrayList<String> medias) throws IOException, MessagingException {
+	static String bodyParse(Part p, ArrayList<String> files, ArrayList<String> medias) throws IOException, MessagingException {
 		if (p.isMimeType("text/*")) { // Contenu texte
 			return (String) p.getContent();
 		}
+		Multipart mp = (Multipart)p.getContent(); //Safe cast, on sait que le contenu est un multipart
 		if (p.isMimeType("multipart/alternative")) { // Contenu ensembliste
-			return traitementMultipart(p, files, medias);
+			return traitementMultipart(mp, files, medias);
 		} else if (p.isMimeType("multipart/mixed")) { // Mails avec pieces jointes
-			return traitementPieceJointe(p, files, medias);
+			return traitementPieceJointe(mp, files, medias);
 		} else if (p.isMimeType("multipart/*")) {
-			return traitementImage(p, files, medias);
+			return traitementImage(mp, files, medias);
 		}
 		return "";
 	}
 
-	private static String traitementMultipart(Part p, ArrayList<String> files,
-			ArrayList<String> medias) throws IOException, MessagingException {
-		Multipart mp = (Multipart) p.getContent();
+	private static String traitementMultipart(Multipart mp, ArrayList<String> files, ArrayList<String> medias) throws IOException, MessagingException {
 		String text = null;
 		text = traitementPart(files, medias, mp, text);
 		return text;
 	}
 
-	private static String traitementPart(ArrayList<String> files,
-			ArrayList<String> medias, Multipart mp, String text)
+	private static String traitementPart(ArrayList<String> files, ArrayList<String> medias, Multipart mp, String text)
 			throws MessagingException, IOException {
 		for (int i = 0; i < mp.getCount(); i++) {
 			Part bp = mp.getBodyPart(i);
@@ -73,10 +70,8 @@ class MessageParser {
 		return text;
 	}
 
-	private static String traitementImage(Part p, ArrayList<String> files,
-			ArrayList<String> medias) throws IOException, MessagingException,
-			FileNotFoundException {
-		Multipart mp = ((Multipart) p.getContent());
+	private static String traitementImage(Multipart mp, ArrayList<String> files, ArrayList<String> medias) throws IOException, MessagingException, FileNotFoundException {
+	
 		String s = "";
 		for (int i = 0; i < mp.getCount(); i++) {
 			BodyPart bp = mp.getBodyPart(i);
@@ -89,10 +84,8 @@ class MessageParser {
 		return s;
 	}
 
-	private static String traitementPieceJointe(Part p,
-			ArrayList<String> files, ArrayList<String> medias)
-			throws IOException, MessagingException, FileNotFoundException {
-		Multipart mp = ((Multipart) p.getContent());
+	private static String traitementPieceJointe(Multipart mp, ArrayList<String> files, ArrayList<String> medias) throws IOException, MessagingException, FileNotFoundException {
+
 		String s = "";
 		for (int i = 0; i < mp.getCount(); i++) {
 			BodyPart bp = mp.getBodyPart(i);
@@ -105,9 +98,7 @@ class MessageParser {
 		return s;
 	}
 
-	private static void createFichier(ArrayList<String> files, BodyPart bp,
-			String path) throws MessagingException, FileNotFoundException,
-			IOException {
+	private static void createFichier(ArrayList<String> files, BodyPart bp,String path) throws MessagingException, FileNotFoundException, IOException {
 		DataHandler dh = bp.getDataHandler();
 		String fileName = bp.getFileName();
 		File file = new File("./webroot/" + path + "/received_" + fileName);
