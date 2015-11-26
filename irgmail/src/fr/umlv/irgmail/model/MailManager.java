@@ -56,14 +56,12 @@ public class MailManager {
 			while (!Thread.currentThread().isInterrupted()) {
 				try {
 					Thread.sleep(10000);
-					System.out.println("Thread : Start");
 					if (inbox.getMessageCount() != mailsCounter) {
 						mailsCounter = inbox.getMessageCount();
 						System.out.println("Thread : Update");
 						headers.clear();
 						contents.clear();
 					}
-					System.out.println("Thread : End");
 				} catch (InterruptedException | MessagingException e) {
 					Thread.currentThread().interrupt();
 				}
@@ -98,7 +96,6 @@ public class MailManager {
 			IOException {
 		Message message = inbox.getMessage(index);
 		contents.put(index, MessageParser.messageToContent(message));
-		System.out.println(headers);
 		if (!headers.get(index).getSeen()) {
 			headers.get(index).setSeen();
 			message.setFlag(SEEN, true);

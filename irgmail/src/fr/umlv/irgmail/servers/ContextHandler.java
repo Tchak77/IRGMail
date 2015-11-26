@@ -6,8 +6,6 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,7 +13,6 @@ import javax.mail.Folder;
 import javax.mail.MessagingException;
 
 import fr.umlv.irgmail.model.MailManager;
-import fr.umlv.irgmail.plugins.Plugable;
 
 public class ContextHandler {
 
@@ -52,10 +49,7 @@ public class ContextHandler {
 	}
 
 	public void getAMail(RoutingContext routingContext) {
-		executor.execute(() -> {
-			handleIfFit(
-					routingContext,
-					(r) -> {
+		executor.execute(() -> { handleIfFit( routingContext, (r) -> {
 						HttpServerResponse response = r.response();
 						String id = r.request().getParam("id");
 						int index;
@@ -74,10 +68,7 @@ public class ContextHandler {
 	}
 
 	public void getAllMails(RoutingContext routingContext) {
-		executor.execute(() -> {
-			handleIfFit(
-					routingContext,
-					(r) -> {
+		executor.execute(() -> { handleIfFit(routingContext, (r) -> {
 						HttpServerResponse response = r.response();
 						String page = r.request().getParam("page");
 						int page_index;
@@ -97,10 +88,7 @@ public class ContextHandler {
 	}
 
 	public void searchMails(RoutingContext routingContext) {
-		executor.execute(() -> {
-			handleIfFit(
-					routingContext,
-					(r) -> {
+		executor.execute(() -> { handleIfFit( routingContext, (r) -> {
 						HttpServerResponse response = r.response();
 						String search = r.request().getParam("search");
 						if (search == null || search == "") {
