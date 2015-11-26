@@ -13,7 +13,7 @@ public class ServerVerticle extends AbstractVerticle {
 	@Override
 	public void start() throws MessagingException, IOException {
 		Router router = Router.router(vertx);
-		ContextHandler contextHandler = ContextHandler.getSingleton();
+		ContextHandler contextHandler = ContextHandler.getInstance();
 		// route to JSON REST APIs
 		router.get("/mails/page/:page").handler(contextHandler::getAllMails);
 		router.get("/mails/:id").handler(contextHandler::getAMail);

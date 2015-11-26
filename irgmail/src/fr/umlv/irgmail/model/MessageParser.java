@@ -21,15 +21,10 @@ import fr.umlv.irgmail.servers.PropertiesHandler;
 class MessageParser {
 
 	/**
-	 * Parse the content of the mail and return the message content
-	 * 
-	 * @param p
-	 *            Part of the message
-	 * @param files
-	 *            List witch will contains the attached files
-	 * @param medias
-	 *            List witch will containts the picture or other witch are
-	 *            inside the message
+	 * Parses the content of the mail and return the message content
+	 * @param p Part of the message
+	 * @param files List witch will contains the attached files
+	 * @param medias List witch will containts the picture or other witch are inside the message
 	 * @return the content of the mail
 	 * @throws IOException
 	 * @throws MessagingException
@@ -116,7 +111,7 @@ class MessageParser {
 		String subject = message.getSubject();
 		String date = "";
 		boolean seen = true;
-		if(PropertiesHandler.getInstance().getProtocol()=="IMAP"){
+		if(PropertiesHandler.getSingleton().getProtocol()=="IMAP"){
 			date = message.getReceivedDate().toString();
 			seen = message.getFlags().contains(SEEN);
 		}
