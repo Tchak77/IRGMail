@@ -51,6 +51,9 @@ public class ServerVerticle extends AbstractVerticle {
 		return new ServerVerticle(propertiesHandler, contextHandler);
 	}
 	
+	/**
+	 * Starts the server with the start-up code defined.
+	 */
 	@Override
 	public void start() throws MessagingException, IOException {
 		Folder inbox = propertiesHandler.getInbox();

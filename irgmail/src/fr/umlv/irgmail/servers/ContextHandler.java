@@ -66,7 +66,7 @@ public class ContextHandler {
 	 * Handles a mail request.
 	 * @param routingContext the routingContext requesting.
 	 */
-	void getAMail(RoutingContext routingContext) {
+	public void getAMail(RoutingContext routingContext) {
 		executor.execute(() -> { 
 			handleIfFit( routingContext, (r) -> {
 						HttpServerResponse response = r.response();
@@ -99,7 +99,7 @@ public class ContextHandler {
 	 * Handles a few mails request.
 	 * @param routingContext the routingContext requesting.
 	 */
-	void getAllMails(RoutingContext routingContext) {
+	public void getAllMails(RoutingContext routingContext) {
 		executor.execute(() -> { handleIfFit(routingContext, (r) -> {
 						HttpServerResponse response = r.response();
 						String page = r.request().getParam("page");
@@ -132,7 +132,7 @@ public class ContextHandler {
 	 * Handles a mail search request.
 	 * @param routingContext the routingContext requesting.
 	 */
-	void searchMails(RoutingContext routingContext) {
+	public void searchMails(RoutingContext routingContext) {
 		executor.execute(() -> { handleIfFit( routingContext, (r) -> {
 						HttpServerResponse response = r.response();
 						String search = r.request().getParam("search");
