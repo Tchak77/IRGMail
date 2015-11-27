@@ -29,6 +29,8 @@ public class MailManager {
 	 */
 	private Folder inbox;
 	
+	private final String protocol;
+	
 	/**
 	 * A local copy of the number of Messages in the folder.
 	 */
@@ -44,8 +46,9 @@ public class MailManager {
 	/**
 	 * Constructs a manager with the default parameters initialized.
 	 */
-	public MailManager() {
+	public MailManager(String protocol) {
 		mailsCounter = 0;
+		this.protocol = Objects.requireNonNull(protocol).toUpperCase();
 		updater = new Thread(newUpdater());
 		headers = new ConcurrentHashMap<Integer, Header>();
 		contents = new ConcurrentHashMap<Integer, Content>();
@@ -75,7 +78,7 @@ public class MailManager {
 		Message[] messages = inbox.getMessages(start, end);
 		for (int i = 0; i < messages.length; i++) {
 			int id = messages[i].getMessageNumber();
-			headers.put(id, MessageParser.messageToHead(messages[i]));
+			headers.put(id, MessageParser.messageToHead(messages[i], protocol));
 		}
 	}
 
@@ -83,7 +86,7 @@ public class MailManager {
 			throws MessagingException {
 		Message[] messages = inbox.getMessages();
 		for (int i = 0; i < messages.length; i++) {
-			Header header = MessageParser.messageToHead(messages[i]);
+			Header header = MessageParser.messageToHead(messages[i], protocol);
 			if (header.contains(keywords)) {
 				int id = messages[i].getMessageNumber();
 				headers.put(id, header);

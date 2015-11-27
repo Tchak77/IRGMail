@@ -4,12 +4,12 @@ import java.io.IOException;
 
 import javax.mail.MessagingException;
 
-import fr.umlv.irgmail.servers.MainServer;
+import fr.umlv.irgmail.servers.ServerVerticle;
 
 public class Main {
 
-	public static void main(String[] args) throws IOException, MessagingException {
-		MainServer server = new MainServer();
+	public static void main(String[] args) throws MessagingException, IOException {
+		ServerVerticle server = ServerVerticle.createVerticle();
 		server.start();
 	}
 }

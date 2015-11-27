@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.Properties;
 
 import javax.mail.Folder;
@@ -12,21 +13,11 @@ import javax.mail.Session;
 import javax.mail.Store;
 
 public class PropertiesHandler {
-
-	private static PropertiesHandler HANDLER = new PropertiesHandler();
 	
 	private final Properties properties;
 	
-	private PropertiesHandler() {
+	public PropertiesHandler() {
 		properties = new Properties();
-	}
-	
-	/**
-	 * Returns the only instance of PropertiesHandler.
-	 * @return the singleton of this class.
-	 */
-	public static PropertiesHandler getSingleton(){
-		return HANDLER;
 	}
 	
 	/**
@@ -61,10 +52,10 @@ public class PropertiesHandler {
 
 	/**
 	 * Returns the protocol specified in the properties.
-	 * @return the protocole specified.
+	 * @return the protocol name specified.
 	 */
 	public String getProtocol() {
-		return properties.getProperty("mail.store.protocol").toUpperCase();
+		return properties.getProperty("mail.store.protocol").toUpperCase(Locale.ENGLISH);
 	}
 	
 }

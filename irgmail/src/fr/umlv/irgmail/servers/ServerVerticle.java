@@ -1,19 +1,47 @@
 package fr.umlv.irgmail.servers;
 
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Objects;
 
+import javax.mail.Folder;
 import javax.mail.MessagingException;
 
 public class ServerVerticle extends AbstractVerticle {
 			
+	private final PropertiesHandler propertiesHandler;
+	private final ContextHandler contextHandler;
+	
+	private ServerVerticle(PropertiesHandler propertiesHandler, ContextHandler contextHandler){
+		this.propertiesHandler = Objects.requireNonNull(propertiesHandler);
+		this.contextHandler = Objects.requireNonNull(contextHandler);
+	}
+	
+	/**
+	 * Creates a ServerVerticle with the correct parameters needed.
+	 * @return a new ServerVerticle.
+	 * @throws FileNotFoundException if the properties files doesnt exists.
+	 * @throws IOException if the properties loading failed.
+	 */
+	public static ServerVerticle createVerticle() throws FileNotFoundException, IOException{
+		PropertiesHandler propertiesHandler = new PropertiesHandler();
+		propertiesHandler.loadProperties();
+		String protocol = propertiesHandler.getProtocol();
+		ContextHandler contextHandler = new ContextHandler(protocol);
+		return new ServerVerticle(propertiesHandler, contextHandler);
+	}
+	
 	@Override
 	public void start() throws MessagingException, IOException {
+		Folder inbox = propertiesHandler.getInbox();
+		contextHandler.startManager(inbox);
+		Vertx vertx = Vertx.vertx();
 		Router router = Router.router(vertx);
-		ContextHandler contextHandler = ContextHandler.getInstance();
 		// route to JSON REST APIs
 		router.get("/mails/page/:page").handler(contextHandler::getAllMails);
 		router.get("/mails/:id").handler(contextHandler::getAMail);

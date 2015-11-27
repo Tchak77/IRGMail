@@ -16,13 +16,11 @@ import fr.umlv.irgmail.model.MailManager;
 
 public class ContextHandler {
 
-	private static ContextHandler HANDLER = new ContextHandler();
-
 	private final MailManager manager;
 	private final ExecutorService executor;
 
-	ContextHandler() {
-		this.manager = new MailManager();
+	public ContextHandler(String protocol) {
+		this.manager = new MailManager(protocol);
 		executor = Executors.newFixedThreadPool(10);
 	}
 
@@ -33,10 +31,6 @@ public class ContextHandler {
 	 */
 	public void startManager(Folder folder) throws MessagingException {
 			manager.startOnFolder(folder);
-	}
-
-	static ContextHandler getInstance() {
-		return HANDLER;
 	}
 
 	private void handleIfFit(RoutingContext routingContext, Handler<RoutingContext> handler) {
