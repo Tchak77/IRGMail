@@ -149,7 +149,7 @@ public class MailManager {
 	 * Returns a Stream of JSON formated mail.
 	 * Loads the mails if they are not yet loaded.
 	 * @param keywords a String array that contains the key words of the search.
-	 * @return Stream<String> a Stream of JSON formated mail.
+	 * @return Stream of strings a Stream of JSON formated mail.
 	 * @throws MessagingException if the distant request on Folder didn't work.
 	 */
 	public Stream<String> headersByKeywords(String... keywords) throws MessagingException {
@@ -167,7 +167,7 @@ public class MailManager {
 	 * Returns a Stream of JSON formated mails.
  	 * Loads the mails if they are not yet loaded.
 	 * @param page an int representing the page in the current Folder.
-	 * @return Stream<String> a Stream of JSON formated mail.
+	 * @return Stream of strings a Stream of JSON formated mail.
 	 * @throws MessagingException if the distant request on Folder didn't work.
 	 */
 	public Stream<String> headersByPage(int page) throws MessagingException {
