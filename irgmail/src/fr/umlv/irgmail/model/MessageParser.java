@@ -21,11 +21,11 @@ class MessageParser {
 	/**
 	 * Parses the content of the mail and return the message content
 	 * @param p Part of the message
-	 * @param files List witch will contains the attached files
-	 * @param medias List witch will containts the picture or other witch are inside the message
+	 * @param files a list witch will contains the attached files
+	 * @param medias a list witch will containts the picture or other witch are inside the message
 	 * @return the content of the mail
-	 * @throws IOException
-	 * @throws MessagingException
+	 * @throws IOException if the attachment loading failed.
+	 * @throws MessagingException if the information fetching failed.
 	 */
 	static String bodyParse(Part p, ArrayList<String> files, ArrayList<String> medias) throws IOException, MessagingException {
 		if (p.isMimeType("text/*")) { // Contenu texte
@@ -34,22 +34,27 @@ class MessageParser {
 		return parseMultipart(p, files, medias); 
 	}
 
+	/**
+	 * Parses a {@link Multipart} of a mail.
+	 * @param p the {@link Part}
+	 * @param files list of attachments
+	 * @param medias list of medias
+	 * @return the parsed String
+	 * @throws IOException
+	 * @throws MessagingException
+	 * @throws FileNotFoundException
+	 */
 	private static String parseMultipart(Part p, ArrayList<String> files, ArrayList<String> medias)
 			throws IOException, MessagingException, FileNotFoundException {
 		Multipart mp = (Multipart)p.getContent(); //Safe cast, on sait que le contenu est un multipart
 		if (p.isMimeType("multipart/alternative")) { // Contenu ensembliste
-			return traitementMultipart(mp, files, medias);
+			return traitementPart(files, medias, mp, null);
 		} else if (p.isMimeType("multipart/mixed")) { // Mails avec pieces jointes
 			return traitementPieceJointe(mp, files, medias);
 		} else if (p.isMimeType("multipart/*")) {
 			return traitementImage(mp, files, medias);
 		}
 		return "";
-	}
-
-	private static String traitementMultipart(Multipart mp, ArrayList<String> files, ArrayList<String> medias) throws IOException, MessagingException {
-		return traitementPart(files, medias, mp, null);
-
 	}
 
 	private static String traitementPart(ArrayList<String> files, ArrayList<String> medias, Multipart mp, String text)

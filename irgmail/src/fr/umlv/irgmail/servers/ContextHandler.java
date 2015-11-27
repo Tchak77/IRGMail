@@ -14,11 +14,25 @@ import javax.mail.MessagingException;
 
 import fr.umlv.irgmail.model.MailManager;
 
+/**
+ * Handler that handles the requests in a {@link RoutingContext}
+ *
+ */
 public class ContextHandler {
 
+	/**
+	 * The mail manager which carries the mails.
+	 */
 	private final MailManager manager;
+	/**
+	 * The service that runs threads.
+	 */
 	private final ExecutorService executor;
 
+	/**
+	 * Constructs a ContextHandler using a protocol name
+	 * @param protocol the name of the protocol
+	 */
 	public ContextHandler(String protocol) {
 		this.manager = new MailManager(protocol);
 		executor = Executors.newFixedThreadPool(10);
@@ -33,6 +47,11 @@ public class ContextHandler {
 			manager.startOnFolder(folder);
 	}
 
+	/**
+	 * Applies the {@link Handler} to the {@link RoutingContext} if it fits the security
+	 * @param routingContext the routingContext requesting.
+	 * @param handler the handler that handles this request.
+	 */
 	private void handleIfFit(RoutingContext routingContext, Handler<RoutingContext> handler) {
 		HttpServerResponse response = routingContext.response();
 		if (!routingContext.request().localAddress().host().equals(routingContext.request().remoteAddress().host())) {
@@ -43,8 +62,13 @@ public class ContextHandler {
 		}
 	}
 
+	/**
+	 * Handles a mail request.
+	 * @param routingContext the routingContext requesting.
+	 */
 	void getAMail(RoutingContext routingContext) {
-		executor.execute(() -> { handleIfFit( routingContext, (r) -> {
+		executor.execute(() -> { 
+			handleIfFit( routingContext, (r) -> {
 						HttpServerResponse response = r.response();
 						String id = r.request().getParam("id");
 						int index;
@@ -52,16 +76,29 @@ public class ContextHandler {
 							response.setStatusCode(404).end();
 							return;
 						}
-						try {
-							response.putHeader("content-type", "application/json")
-									.end(manager.mailToJSON(index));
-						} catch (MessagingException | IOException e) {
-							response.setStatusCode(503).end();
-						}
+						answerWithHeader(response, index);
 					});
 		});
 	}
 
+	/**
+	 * Put a header in a JSON format to the response.
+	 * @param response the response to be told.
+	 * @param index the index of the mail.
+	 */
+	private void answerWithHeader(HttpServerResponse response, int index) {
+		try {
+			response.putHeader("content-type", "application/json")
+					.end(manager.mailToJSON(index));
+		} catch (MessagingException | IOException e) {
+			response.setStatusCode(503).end();
+		}
+	}
+
+	/**
+	 * Handles a few mails request.
+	 * @param routingContext the routingContext requesting.
+	 */
 	void getAllMails(RoutingContext routingContext) {
 		executor.execute(() -> { handleIfFit(routingContext, (r) -> {
 						HttpServerResponse response = r.response();
@@ -71,17 +108,30 @@ public class ContextHandler {
 							response.setStatusCode(404).end();
 							return;
 						}
-						try {
-							response.putHeader("content-type", "application/json")
-									.end(manager.headersByPage(page_index)
-									.collect(joining(", ", "[", "]")));
-						} catch (MessagingException e) {
-							response.setStatusCode(503).end();
-						}
+						answerWithHeaders(response, page_index);
 					});
 		});
 	}
 
+	/**
+	 * Put the headers in a JSON format to the responses.
+	 * @param response the response to be told.
+	 * @param page_index the page index of the mails
+	 */
+	private void answerWithHeaders(HttpServerResponse response, int page_index) {
+		try {
+			response.putHeader("content-type", "application/json")
+					.end(manager.headersByPage(page_index)
+					.collect(joining(", ", "[", "]")));
+		} catch (MessagingException e) {
+			response.setStatusCode(503).end();
+		}
+	}
+
+	/**
+	 * Handles a mail search request.
+	 * @param routingContext the routingContext requesting.
+	 */
 	void searchMails(RoutingContext routingContext) {
 		executor.execute(() -> { handleIfFit( routingContext, (r) -> {
 						HttpServerResponse response = r.response();
@@ -90,14 +140,23 @@ public class ContextHandler {
 							response.setStatusCode(404).end();
 							return;
 						}
-						try {
-							response.putHeader("content-type", "application/json")
-									.end(manager.headersByKeywords(search)
-									.collect(joining(", ", "[", "]")));
-						} catch (MessagingException e) {
-							response.setStatusCode(503).end();
-						}
+						answerWithSearch(response, search);
 					});
 		});
+	}
+
+	/**
+	 * Put the headers of the search in a JSON format to the response.
+	 * @param response the response to be told.
+	 * @param search the item of the search.
+	 */
+	private void answerWithSearch(HttpServerResponse response, String search) {
+		try {
+			response.putHeader("content-type", "application/json")
+					.end(manager.headersByKeywords(search)
+					.collect(joining(", ", "[", "]")));
+		} catch (MessagingException e) {
+			response.setStatusCode(503).end();
+		}
 	}
 }

@@ -12,11 +12,26 @@ import java.util.Objects;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 
+/**
+ * This class provides a vert.x server.
+ * It allows routing managing through handlers.
+ */
 public class ServerVerticle extends AbstractVerticle {
-			
+	
+	/**
+	 * The handler of the properties files.
+	 */
 	private final PropertiesHandler propertiesHandler;
+	/**
+	 * The handler of the requesting routingContexts.
+	 */
 	private final ContextHandler contextHandler;
 	
+	/**
+	 * Constructs a ServerVerticle.
+	 * @param propertiesHandler the handler in charge of getting properties.
+	 * @param contextHandler the handler in charge of handling requests.
+	 */
 	private ServerVerticle(PropertiesHandler propertiesHandler, ContextHandler contextHandler){
 		this.propertiesHandler = Objects.requireNonNull(propertiesHandler);
 		this.contextHandler = Objects.requireNonNull(contextHandler);

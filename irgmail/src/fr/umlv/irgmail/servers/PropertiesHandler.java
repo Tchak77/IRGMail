@@ -12,14 +12,13 @@ import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Store;
 
+/**
+ * Handler of the properties written in the config.properties file.
+ */
 public class PropertiesHandler {
 	
-	private final Properties properties;
-	
-	public PropertiesHandler() {
-		properties = new Properties();
-	}
-	
+	private final Properties properties = new Properties();
+		
 	/**
 	 * Loads properties form the "config.properties" file located at the root project.
 	 * This method should be used at first on this class.

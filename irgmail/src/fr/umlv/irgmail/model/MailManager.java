@@ -14,10 +14,8 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 
 /**
- * Implementation of a mail manager which can convert Messages of a Folder to a JSON formatable Object.
+ * Implementation of a mail manager which can convert {@link Message} of a {@link Folder} to a JSON formatable Object.
  * This class supports concurrent modifications.
- * @see Folder
- * @see Message
  *
  */
 public class MailManager {
