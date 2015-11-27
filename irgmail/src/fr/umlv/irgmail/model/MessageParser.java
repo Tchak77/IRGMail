@@ -104,12 +104,19 @@ class MessageParser {
 		fos.close();
 	}
 
+	/**
+	 * Converts a Message to a Header format.
+	 * @param message the Message to convert.
+	 * @param protocol the protocol used to get informations.
+	 * @return a new Header.
+	 * @throws MessagingException if the message's information loading failed.
+	 */
 	static Header messageToHead(Message message, String protocol) throws MessagingException {
 		String from = Arrays.toString(message.getFrom());
 		String subject = message.getSubject();
 		String date = "";
 		boolean seen = true;
-		if(protocol.equals("IMAP")){
+		if(protocol.contains("IMAP")){
 			date = message.getReceivedDate().toString();
 			seen = message.getFlags().contains(SEEN);
 		}
@@ -117,6 +124,13 @@ class MessageParser {
 		return new Header(id, from, subject, seen, date);
 	}
 
+	/**
+	 * Converts a Message to a Content format.
+	 * @param message the message to convert.
+	 * @return a new Contant.
+	 * @throws MessagingException if the message's information loading failed.
+	 * @throws IOException if the attachments loading failed.
+	 */
 	static Content messageToContent(Message message) throws MessagingException,
 			IOException {
 		ArrayList<String> files = new ArrayList<String>();

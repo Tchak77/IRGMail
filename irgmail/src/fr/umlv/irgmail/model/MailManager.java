@@ -25,14 +25,17 @@ public class MailManager {
 	private static final int PAGE_OFFSET = 10;
 
 	/**
-	 * The folder used to get the Messages from.
+	 * The folder used to get the Messages from
 	 */
 	private Folder inbox;
 	
+	/**
+	 * The protocol name used to manage mails
+	 */
 	private final String protocol;
 	
 	/**
-	 * A local copy of the number of Messages in the folder.
+	 * A local copy of the number of Messages in the folder
 	 */
 	private int mailsCounter;
 	
@@ -40,11 +43,20 @@ public class MailManager {
 	 * A Thread that will allows to get the updates of the distant folder
 	 */
 	private final Thread updater;
+	
+	/**
+	 * List of Header fetched
+	 */
 	private ConcurrentHashMap<Integer, Header> headers;
+	
+	/**
+	 * List of Content fetched
+	 */
 	private ConcurrentHashMap<Integer, Content> contents;
 
 	/**
 	 * Constructs a manager with the default parameters initialized.
+	 * @param protocol the protocol's name.
 	 */
 	public MailManager(String protocol) {
 		mailsCounter = 0;
@@ -54,16 +66,16 @@ public class MailManager {
 		contents = new ConcurrentHashMap<Integer, Content>();
 	}
 	
+	/**
+	 * Returns the updater which updates the maps.
+	 * @return the runnable which updates.
+	 */
 	private Runnable newUpdater(){
 		return () -> {
 			while (!Thread.currentThread().isInterrupted()) {
 				try {
 					Thread.sleep(10000);
-					if (inbox.getMessageCount() != mailsCounter) {
-						mailsCounter = inbox.getMessageCount();
-						headers.clear();
-						contents.clear();
-					}
+					clearOnUpdate();
 				} catch (InterruptedException | MessagingException e) {
 					Thread.currentThread().interrupt();
 				}
@@ -71,6 +83,24 @@ public class MailManager {
 		};
 	}
 
+	/**
+	 * Clears the maps if the distant server was updated.
+	 * @throws MessagingException if the information fetching failed.
+	 */
+	private void clearOnUpdate() throws MessagingException {
+		if (inbox.getMessageCount() != mailsCounter) {
+			mailsCounter = inbox.getMessageCount();
+			headers.clear();
+			contents.clear();
+		}
+	}
+
+	/**
+	 * Collects mails on a Header format depending on a page number 
+	 * and add it to the map.
+	 * @param page the page asked.
+	 * @throws MessagingException if the mails fetching failed.
+	 */
 	private void collectHeadersByPage(int page) throws MessagingException {
 		mailsCounter = inbox.getMessageCount();
 		int end = mailsCounter - page * PAGE_OFFSET;
@@ -82,6 +112,12 @@ public class MailManager {
 		}
 	}
 
+	/**
+	 * Collects mails on a Header format depending on a search
+	 * and add it to the map.
+	 * @param page the page asked.
+	 * @throws MessagingException if the mails fetching failed.
+	 */
 	private void collectHeadersByKeyword(String... keywords)
 			throws MessagingException {
 		Message[] messages = inbox.getMessages();
@@ -94,6 +130,13 @@ public class MailManager {
 		}
 	}
 
+	/**
+	 * Collects a mail on a Content format depending on an index 
+	 * and add it to the map.
+	 * @param page the page asked.
+	 * @throws MessagingException if the mails fetching failed.
+	 * @throws IOException if the attachments loading failed.
+	 */
 	private void collectContent(int index) throws MessagingException,
 			IOException {
 		Message message = inbox.getMessage(index);
@@ -106,12 +149,12 @@ public class MailManager {
 
 	/**
 	 * Returns a Stream of JSON formated mail.
+	 * Loads the mails if they are not yet loaded.
 	 * @param keywords a String array that contains the key words of the search.
 	 * @return Stream<String> a Stream of JSON formated mail.
 	 * @throws MessagingException if the distant request on Folder didn't work.
 	 */
-	public Stream<String> headersByKeywords(String... keywords)
-			throws MessagingException {
+	public Stream<String> headersByKeywords(String... keywords) throws MessagingException {
 		collectHeadersByKeyword(keywords);
 		ArrayList<Header> list = new ArrayList<Header>();
 		for (Header header : headers.values()) {
@@ -124,15 +167,15 @@ public class MailManager {
 
 	/**
 	 * Returns a Stream of JSON formated mails.
+ 	 * Loads the mails if they are not yet loaded.
 	 * @param page an int representing the page in the current Folder.
 	 * @return Stream<String> a Stream of JSON formated mail.
 	 * @throws MessagingException if the distant request on Folder didn't work.
 	 */
 	public Stream<String> headersByPage(int page) throws MessagingException {
 		ArrayList<Header> tmp = new ArrayList<Header>();
-		int start, end = 0;
-		start = Math.max(0, mailsCounter - (page + 1) * PAGE_OFFSET);
-		end = mailsCounter - page * PAGE_OFFSET;
+		int start = Math.max(0, mailsCounter - (page + 1) * PAGE_OFFSET);
+		int end = mailsCounter - page * PAGE_OFFSET;
 		if (headers.get(start + 1) == null) {
 			collectHeadersByPage(page);
 		}
