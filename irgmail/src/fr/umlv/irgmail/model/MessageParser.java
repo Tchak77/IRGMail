@@ -16,6 +16,10 @@ import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 
+/**
+ * A class which can operate on a {@link Message} in order to get 
+ * a known class in the {@link Header}, {@link Content} model.
+ */
 class MessageParser {
 
 	/**
